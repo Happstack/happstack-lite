@@ -1,0 +1,21 @@
+Name:                happstack-lite
+Version:             6.0.0
+Synopsis:            Happstack minus the useless stuff
+Homepage:            http://www.happstack.com/
+License:             BSD3
+License-file:        LICENSE
+Author:              Jeremy Shaw
+Maintainer:          jeremy@n-heptane.com
+Stability:           Provisional
+Category:            Web
+Build-type:          Simple
+Cabal-version:       >=1.2
+
+Library
+  Exposed-modules:
+                 Happstack.Lite
+  
+  Build-depends: base < 4.4,
+                 bytestring == 0.9.*,
+                 happstack-server == 6.2.*,
+                 text == 0.11.*
