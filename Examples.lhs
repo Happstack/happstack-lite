@@ -1,6 +1,36 @@
-In this example, we demonstrate how to get starting with a simple, little web application.
+Happstack is a powerful web framework with a rich API that has evolved
+over the last 7 years to meet the needs of real world web
+development. Unfortunately, a rich and flexible API can also be
+daunting when all you need is something simple. What many people don't
+realize, is that inside Happstack lives a very simple and easy to use
+web framework.
 
-First we need some LANGUAGE pragmas:
+happstack-lite gives you that simple, easy to use version of
+Happstack, with out forcing you to give up any of the power and
+flexible.
+
+To create happstack-lite, we have 
+
+ 1. gathered all the essential types and functions you need to develop
+a web application into a single module (Happstack.Lite) so you don't
+have to hunt around for what you need.
+
+ 2. Given the functions much simpler type signatures. We've eliminated
+monad transformers, gotten rid of most of the type classes, etc.
+
+ 3. Created this tutorial which demonstrates all the essential things
+you need to know to write a web application in less than 2000 words.
+
+But, here is the best part. happstack-lite is 100% compatible with
+Happstack. If you are developing an application using happstack-lite,
+and you need an advanced feature from Happstack, you can simple import
+the module and use it!
+
+While happstack-lite is 'lite' compared to regular Happstack, it is
+still a full featured framework on par with other Haskell web
+frameworks.
+
+Now onto the tutorial. First we need some LANGUAGE pragmas:
 
 > {-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
 > module Main where
@@ -218,4 +248,3 @@ disk.
 In most cases, you don't want a user to upload a file just to have it
 deleted. Normally the upload handler would use 'moveFile' or
 'copyFile' to move (or copy) the temporary file to a permanent location.
-

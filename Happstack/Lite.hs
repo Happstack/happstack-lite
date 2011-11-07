@@ -66,7 +66,6 @@ import qualified Happstack.Server as S
 
 -- * Starting the server
 
-
 -- | configuration to be used with 'serve' function
 data ServerConfig = 
     ServerConfig { port      :: Int       -- ^ port to listen on
