@@ -135,7 +135,7 @@ guardRq = S.guardRq
 -- >     do method [GET, HEAD]
 -- >        ...
 method :: (MatchMethod method) => method -> ServerPart ()
-method = S.methodOnly 
+method = S.method
 
 -- * Creating a Response
 

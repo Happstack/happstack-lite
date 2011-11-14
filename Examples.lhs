@@ -1,36 +1,60 @@
 Happstack is a powerful web framework with a rich API that has evolved
 over the last 7 years to meet the needs of real world web
-development. Unfortunately, a rich and flexible API can also be
+development. Unfortunately a rich and flexible API can also be
 daunting when all you need is something simple. What many people don't
-realize, is that inside Happstack lives a very simple and easy to use
+realize is that inside Happstack lives a very simple and easy to use
 web framework.
 
-happstack-lite gives you that simple, easy to use version of
-Happstack, with out forcing you to give up any of the power and
-flexible.
+happstack-lite brings that simple, easy to use version of Happstack to
+light, with out forcing you to give up any of the power and flexible.
 
 To create happstack-lite, we have 
 
- 1. gathered all the essential types and functions you need to develop
+ 1. Gathered all the essential types and functions you need to develop
 a web application into a single module (Happstack.Lite) so you don't
 have to hunt around for what you need.
 
- 2. Given the functions much simpler type signatures. We've eliminated
-monad transformers, gotten rid of most of the type classes, etc.
+ 2. Given the functions much simpler type signatures by eliminating
+monad transformers, getting rid of most of the type classes, etc.
 
- 3. Created this tutorial which demonstrates all the essential things
-you need to know to write a web application in less than 2000 words.
+ 3. Created this tutorial which demonstrates, in less than 2000 words,
+all the essential things you need to know to get started writing a web
+application.
 
 But, here is the best part. happstack-lite is 100% compatible with
 Happstack. If you are developing an application using happstack-lite,
 and you need an advanced feature from Happstack, you can simple import
-the module and use it!
+the corresponding module and use it! To switch from happstack-lite to
+regular happstack simply change your import from `Happstack.Lite` to
+`Happstack.Server` and change `serve` to `simpleHTTP`. That's it!
 
 While happstack-lite is 'lite' compared to regular Happstack, it is
 still a full featured framework on par with other Haskell web
 frameworks.
 
-Now onto the tutorial. First we need some LANGUAGE pragmas:
+This document is a literate Haskell file. That means save this file
+and run it with runhaskell!
+
+The latest copy of this tutorial is located at:
+
+The latest HTML-ized version is located at:
+
+
+Now onto the tutorial. 
+
+<ul>
+ <li><a href="#starting">Starting the Server</a></li>
+ <li><a href="#static">Static Routing</a></li>
+ <li><a href="#templates">Templates</a></li>
+ <li><a href="#path">Dynamic Path Segments</a></li>
+ <li><a href="#query">Query String Parameters</a></li>
+ <li><a href="#forms">Form Data</a></li>
+ <li><a href="#cookies">Cookies</a></li>
+ <li><a href="#fileserving">File Serving</a></li>
+ <li><a href="#uploads">File Uploads</a></li>
+</ul>
+
+First we need some LANGUAGE pragmas:
 
 > {-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
 > module Main where
@@ -42,20 +66,26 @@ And then we have some imports:
 > import Data.Text (Text)
 > import Data.Text.Lazy (unpack)
 > import Happstack.Lite
-> import Text.Blaze
-> import Text.Blaze.Html5           
+> import Text.Blaze.Html5 (Html, (!), a, form, input, p, toHtml, label)
 > import Text.Blaze.Html5.Attributes (action, enctype, href, name, size, type_, value)
 > import qualified Text.Blaze.Html5 as H
 > import qualified Text.Blaze.Html5.Attributes as A
 
-To start the app we just call the 'serve' function. The first argument
+<h3><a name="starting">Starting the Server</a></h3>
+
+To start the app we call the `serve` function. The first argument
 is an optional configuration parameter. The second argument is our web
 application:
 
 > main :: IO ()
 > main = serve Nothing myApp
 
-A web application has the type 'ServerPart Response'. 'ServerPart' is a web serving monad. Happstack provides a bunch of functions which run in the 'ServerPart' monad. You can think of it as the web equivalent of the 'IO' monad. Here is our web application:
+A web application has the type `ServerPart Response`. You can think of
+`ServerPart` as the web equivalent of the `IO` monad. 
+
+<h3><a name="static">Static Routing</a></h3
+
+Here is our web application:
 
 > myApp :: ServerPart Response
 > myApp = msum
@@ -68,7 +98,17 @@ A web application has the type 'ServerPart Response'. 'ServerPart' is a web serv
 >   , homePage
 >   ]
 
-This web application has two routes. 
+The top-level of our application is just a bunch of routes mappings to handlers.
+
+`dir` is guard used to match on static path components. For example, `dir "echo"`, will match on http://localhost:8000/echo. To match on `"/foo/bar"` you would write, `dir "foo" $ dir "bar" $ handler`.
+
+Each of the routes is tried until one successfully returns a value. In this case, a `Response`.
+
+We convert the list of handlers in a single handler using `msum`. 
+
+The last handler, `homePage` is not guarded by anything, so it will always be called if none of the other handlers were successful.
+
+<h3><a name="templates">HTML Templates</a></h3>
 
 Since this is a web application, we are going to want to create some HTML pages. We will do that using blaze-html. A blaze tutorial can be found here:
 
@@ -103,7 +143,9 @@ We can then use that template like this:
 
 'ok' tells the server to return the page with the HTTP response code '200 OK'. There are other helper functions like 'notFound' and 'seeOther' for other response codes. Or use 'setResponseCode' to specify a response code by number.
 
-The 'dir' function only matches on static path segments. If we have a dynamic path segment, we can use the 'path' function to capture the value and optionally convert it to another type such as Integer. In this example we just echo the captured path segment in the html. Trying visiting:
+<h3><a name="path">Dynamic Path Segments</a></h3>
+
+The 'dir' function only matches on static path segments. If we have a dynamic path segment, we can use the 'path' function to capture the value and optionally convert it to another type such as Integer. In this example we just echo the captured path segment in the html. For example, trying visiting:
 
 http://localhost:8000/echo/fantastic
 
@@ -113,6 +155,8 @@ http://localhost:8000/echo/fantastic
 >         ok $ template "echo" $ do 
 >           p $ "echo says: " >> toHtml msg
 >           p "Change the url to echo something else."
+
+<h3><a name="query">Query String Parameters</a></h3>
 
 We can also extract values from the query string part of the URL. The
 query string is the part that looks like "?foo=bar". Trying visiting:
@@ -126,9 +170,11 @@ http://localhost:8000/query?foo=bar
 >          p $ "foo is set to: " >> toHtml (show mFoo)
 >          p $ "change the url to set it to something else."
 
-'lookText' will normally fail (by calling 'mzero') if the parameter is not found. In this example we used 'optional' from Control.Applicative so that it will return a 'Maybe' value instead.
+`lookText` will normally fail (by calling `mzero`) if the parameter is not found. In this example we used `optional` from `Control.Applicative` so that it will return a `Maybe` value instead.
 
-We can use 'lookText' (and friends) to extract values from forms as well.
+<h3><a name="forms">Form Data</a></h3>
+
+We can use `lookText` (and friends) to extract values from forms as well.
 
 > formPage :: ServerPart Response
 > formPage = msum [ viewForm, processForm ]
@@ -151,15 +197,19 @@ We can use 'lookText' (and friends) to extract values from forms as well.
 >              H.p (toHtml msg)
 >               
 
-We can use the same 'lookText' function to look up values in in form data.
+We use the same `lookText` function from the previous section to look up values in in form data.
 
-You will also note that we use the 'method' function to select between a 'GET' request and a 'POST' request. 
+You will also note that we use the `method` function to select between a `GET` request and a `POST` request. 
 
 When the user first views the form, the browser will request "/form"
-using the 'GET' method. In the form tag, we see that the form will
+using the `GET` method. In the form tag, we see that the form will
 also be submitted to "/form" when the user presses the submit
 button. But in the form tag we have set the method attribute to
-'POST'.
+`POST`.
+
+<h3><a name="cookies">Cookies</a></h3>
+
+This example extends the form example to save the message in a cookie. That means you can navigate away from the page and when you come back later it will remember the message you saved.
 
 > fortune :: ServerPart Response
 > fortune = msum [ viewFortune, updateFortune ]
@@ -184,39 +234,42 @@ button. But in the form tag we have set the method attribute to
 >              addCookies [(Session, mkCookie "fortune" (unpack fortune))]
 >              seeOther ("/fortune" :: String) (toResponse ())
 
-This example extends the form example to save the message in a cookie. That means you can navigate away from the page and when you come back later it will remember the message you saved.
 
 There are only a few new things in this example compared to the form example.
 
- 1. lookCookieValue works just like lookText, except it looks up cookies instead of request paramaters or form data.
+ 1. `lookCookieValue` works just like `lookText`, except it looks for the value in the cookies instead of request paramaters or form data.
 
- 2. addCookies sends cookies to the browser. addCookies has the type:
+ 2. `addCookies` sends cookies to the browser. addCookies has the type:
 
-     addCookies :: [(CookieLife, Cookie)] -> ServerPart ()
+     `addCookies :: [(CookieLife, Cookie)] -> ServerPart ()`
 
- 3. 'CookieLife' specifies how long the cookie is valid. 'Session' means it is only valid until the browser window is closed.
+ 3. `CookieLife` specifies how long the cookie is valid. `Session` means it is only valid until the browser window is closed.
 
- 4. 'mkCookie' takes the cookie name and the cookie value and makes a Cookie.
+ 4. `mkCookie` takes the cookie name and the cookie value and makes a `Cookie`.
 
- 5. 'seeOther' does a 303 redirect tells the browser to do a new GET request on "/fortune".
+ 5. `seeOther` (aka, 303 redirect) tells the browser to do a new GET request on "/fortune".
+
+<h3><a name="fileserving">File Serving</a></h3>
 
 In most web applications, we will want to serve static files from the
-disk such as images, stylesheets, external javascript, etc. We can do
-that using the serveDirectory function.
+disk such as images, stylesheets, javascript, etc. We can do
+that using the `serveDirectory` function.
 
 > fileServing :: ServerPart Response
 > fileServing =
 >     serveDirectory EnableBrowsing ["index.html"] "."
 
-The first argument specifies whether serveDirectory should create directory listings or not.
+The first argument specifies whether `serveDirectory` should create directory listings or not.
 
 The second argument is a list of index files. If the user requests a directory and the directory contains a index file (in this example "index.html"), then the server will display that index file instead of a directory listing.
 
 The third argument is the path to the directory we want to serve files from. Here we serve files from the current directory.
 
-On support platforms (Linux, OS X, Windows), the 'serveDirectory' function will automatically use sendfile() to serve the files. sendfile() uses low-level kernel operations to transfer files directly from the disk to the network with minimal CPU usage and maximal bandwidth usage.
+On support platforms (Linux, OS X, Windows), the `serveDirectory` function will automatically use sendfile() to serve the files. sendfile() uses low-level kernel operations to transfer files directly from the disk to the network with minimal CPU usage and maximal bandwidth usage.
 
-Handling file uploads is very straight forward. We create a form, just as before. Except instead of 'lookText' we use 'lookFile'.
+<h3><a name="uploads">File Uploads</a></h3>
+
+Handling file uploads is very straight forward. We create a form, just as before. Except instead of `lookText` we use `lookFile`.
 
 > upload :: ServerPart Response
 > upload = 
@@ -241,10 +294,10 @@ Handling file uploads is very straight forward. We create a form, just as before
 >                 p (toHtml $ "content-type:   " ++ show contentType)
 
 When a file is uploaded, we store it in a temporary location. The
-temporary file will automatically be deleted after your request
-handler finishes. That ensures that unused files don't clutter up the
-disk. 
+temporary file will automatically be deleted after the server has sent
+the response. That ensures that unused files don't clutter up the
+disk.
 
 In most cases, you don't want a user to upload a file just to have it
-deleted. Normally the upload handler would use 'moveFile' or
-'copyFile' to move (or copy) the temporary file to a permanent location.
+deleted. Normally the upload handler would use `moveFile` or
+`copyFile` to move (or copy) the temporary file to a permanent location.
