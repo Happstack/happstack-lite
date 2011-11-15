@@ -1,5 +1,5 @@
 Name:                happstack-lite
-Version:             6.0.0
+Version:             6.0.1
 Synopsis:            Happstack minus the useless stuff
 Description:         This packages provides a subset of Happstack that is easier to learn but still very useful. It as 100% compatible with the full version of Happstack.
 Homepage:            http://www.happstack.com/

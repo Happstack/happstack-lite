@@ -52,9 +52,10 @@ module Happstack.Lite
      , asContentType
      -- * Other
      , MonadPlus(..)
+     , msum
      ) where
 
-import Control.Monad (MonadPlus(..))
+import Control.Monad (MonadPlus(..), msum)
 import qualified Data.ByteString as B
 import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Int (Int64)
