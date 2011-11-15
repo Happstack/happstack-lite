@@ -41,6 +41,8 @@ http://patch-tag.com/r/mae/happstack/snapshot/current/content/pretty/happstack-l
 
 The latest HTML-ized version of this document is located at:
 
+<a href="http://happstack.com/docs/happstack-lite/happstack-lite.html">http://happstack.com/docs/happstack-lite/happstack-lite.html</a>
+
 The Haddock documentation for happstack-lite is located at:
 
 <a href="http://happstack.com/docs/6.0.0/happstack-lite/index.html">http://happstack.com/docs/6.0.0/happstack-lite/index.html</a>
