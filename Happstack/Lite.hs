@@ -51,16 +51,16 @@ module Happstack.Lite
      , serveFile
      , asContentType
      -- * Other
-     , msum
+     , MonadPlus(..)
      ) where
 
-import Control.Monad (MonadPlus, msum)
+import Control.Monad (MonadPlus(..))
 import qualified Data.ByteString as B
 import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Int (Int64)
 import Data.Maybe (fromMaybe)
 import Data.Text.Lazy (Text)
-import Happstack.Server (ContentType, Request, Response, ServerPart, FromReqURI, Method(..), MatchMethod, ToMessage(..), Cookie(..), CookieLife(..), Browsing, mkCookie, toResponseBS)
+import Happstack.Server (ContentType, Request, Response, ServerPart, FromReqURI, Method(..), MatchMethod, ToMessage(..), Cookie(..), CookieLife(..), Browsing, mkCookie)
 import Happstack.Server.SURI (ToSURI)
 import qualified Happstack.Server as S
 
@@ -89,7 +89,10 @@ defaultServerConfig =
                  , tmpDir    = "/tmp/"
                  }
 
-serve :: Maybe ServerConfig -> ServerPart Response -> IO ()
+-- | start the server and handle requests using the supplied 'ServerPart'
+serve :: Maybe ServerConfig  -- ^ if Nothing, then use 'defaultServerConfig'
+      -> ServerPart Response -- ^ request handler
+      -> IO ()
 serve mServerConf part = 
     let ServerConfig{..} = fromMaybe defaultServerConfig mServerConf
     in S.simpleHTTP (S.nullConf { S.port = port }) $
@@ -141,6 +144,26 @@ method = S.method
 
 toResponse :: (ToMessage a) => a -> Response
 toResponse = S.toResponse
+
+-- | A low-level function to build a 'Response' from a content-type
+-- and a 'ByteString'.
+--
+-- Creates a 'Response' in a manner similar to the 'ToMessage' class,
+-- but without requiring an instance declaration.
+-- 
+-- example:
+-- 
+-- > import Data.ByteString.Char8 as C
+-- > import Data.ByteString.Lazy.Char8 as L
+-- > import Happstack.Lite
+-- >
+-- > main = serve Nothing $ ok $ toResponseBS (C.pack "text/plain") (L.pack "hello, world")
+--
+-- (note: 'C.pack' and 'L.pack' only work for ascii. For unicode strings you would need to use @utf8-string@, @text@, or something similar to create a valid 'ByteString').
+toResponseBS :: B.ByteString -- ^ content-type
+             -> ByteString -- ^ response body
+             -> Response
+toResponseBS = S.toResponseBS
 
 -- * Response code
 

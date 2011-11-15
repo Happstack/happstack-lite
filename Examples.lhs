@@ -6,12 +6,12 @@ realize is that inside Happstack lives a very simple and easy to use
 web framework.
 
 happstack-lite brings that simple, easy to use version of Happstack to
-light, with out forcing you to give up any of the power and flexible.
+light, without forcing you to give up any of the power and flexible.
 
 To create happstack-lite, we have 
 
  1. Gathered all the essential types and functions you need to develop
-a web application into a single module (Happstack.Lite) so you don't
+a web application into a single module `Happstack.Lite` so you don't
 have to hunt around for what you need.
 
  2. Given the functions much simpler type signatures by eliminating
@@ -37,8 +37,17 @@ and run it with runhaskell!
 
 The latest copy of this tutorial is located at:
 
-The latest HTML-ized version is located at:
+http://patch-tag.com/r/mae/happstack/snapshot/current/content/pretty/happstack-lite/Examples.lhs
 
+The latest HTML-ized version of this document is located at:
+
+The Haddock documentation for happstack-lite is located at:
+
+<a href="http://happstack.com/docs/6.0.0/happstack-lite/index.html">http://happstack.com/docs/6.0.0/happstack-lite/index.html</a>
+
+For more in-depth information, you can also refer to the Happstack Crash Course at:
+
+<a href="http://www.happstack.com/docs/crashcourse/index.html">http://www.happstack.com/docs/crashcourse/index.html</a>
 
 Now onto the tutorial. 
 
@@ -83,7 +92,7 @@ application:
 A web application has the type `ServerPart Response`. You can think of
 `ServerPart` as the web equivalent of the `IO` monad. 
 
-<h3><a name="static">Static Routing</a></h3
+<h3><a name="static">Static Routing</a></h3>
 
 Here is our web application:
 
@@ -112,7 +121,7 @@ The last handler, `homePage` is not guarded by anything, so it will always be ca
 
 Since this is a web application, we are going to want to create some HTML pages. We will do that using blaze-html. A blaze tutorial can be found here:
 
-http://jaspervdj.be/blaze/tutorial.html
+<a href="http://jaspervdj.be/blaze/tutorial.html">http://jaspervdj.be/blaze/tutorial.html</a>
 
 I like to make a template function which captures common elements of pages in my web app, such as importing style sheets, external javascript files, menus, etc. For this tutorial we have a very simple template:
 
@@ -141,13 +150,13 @@ We can then use that template like this:
 >            H.p $ a ! href "/files"         $ "file serving"
 >            H.p $ a ! href "/upload"        $ "file uploads"
 
-'ok' tells the server to return the page with the HTTP response code '200 OK'. There are other helper functions like 'notFound' and 'seeOther' for other response codes. Or use 'setResponseCode' to specify a response code by number.
+`ok` tells the server to return the page with the HTTP response code '200 OK'. There are other helper functions like `notFound` and `seeOther` for other response codes. Or use `setResponseCode` to specify a response code by number.
 
 <h3><a name="path">Dynamic Path Segments</a></h3>
 
-The 'dir' function only matches on static path segments. If we have a dynamic path segment, we can use the 'path' function to capture the value and optionally convert it to another type such as Integer. In this example we just echo the captured path segment in the html. For example, trying visiting:
+The `dir` function only matches on static path segments. If we have a dynamic path segment, we can use the `path` function to capture the value and optionally convert it to another type such as Integer. In this example we just echo the captured path segment in the html. For example, trying visiting:
 
-http://localhost:8000/echo/fantastic
+<a href="http://localhost:8000/echo/fantastic">http://localhost:8000/echo/fantastic</a>
 
 > echo :: ServerPart Response
 > echo =
@@ -161,7 +170,7 @@ http://localhost:8000/echo/fantastic
 We can also extract values from the query string part of the URL. The
 query string is the part that looks like "?foo=bar". Trying visiting:
 
-http://localhost:8000/query?foo=bar
+<a href="http://localhost:8000/query?foo=bar">http://localhost:8000/query?foo=bar</a>
 
 > queryParams :: ServerPart Response
 > queryParams =
