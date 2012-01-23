@@ -1,5 +1,5 @@
 Name:                happstack-lite
-Version:             6.0.2
+Version:             6.0.4
 Synopsis:            Happstack minus the useless stuff
 Description:         This packages provides a subset of Happstack that is easier to learn but still very useful. It as 100% compatible with the full version of Happstack.
 Homepage:            http://www.happstack.com/
@@ -16,7 +16,7 @@ Library
   Exposed-modules:
                  Happstack.Lite
   
-  Build-depends: base < 5,
-                 bytestring == 0.9.*,
-                 happstack-server == 6.4.*,
-                 text == 0.11.*
+  Build-depends: base             < 5,
+                 bytestring       == 0.9.*,
+                 happstack-server == 6.5.*,
+                 text             == 0.11.*
