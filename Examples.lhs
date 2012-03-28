@@ -8,7 +8,7 @@ web framework.
 happstack-lite brings that simple, easy to use version of Happstack to
 light, without forcing you to give up any of the power and flexible.
 
-To create happstack-lite, we have 
+To create happstack-lite, we have
 
  1. Gathered all the essential types and functions you need to develop
 a web application into a single module `Happstack.Lite` so you don't
@@ -51,7 +51,7 @@ For more in-depth information, you can also refer to the Happstack Crash Course 
 
 <a href="http://www.happstack.com/docs/crashcourse/index.html">http://www.happstack.com/docs/crashcourse/index.html</a>
 
-Now onto the tutorial. 
+Now onto the tutorial.
 
 <ul>
  <li><a href="#starting">Starting the Server</a></li>
@@ -92,7 +92,7 @@ application:
 > main = serve Nothing myApp
 
 A web application has the type `ServerPart Response`. You can think of
-`ServerPart` as the web equivalent of the `IO` monad. 
+`ServerPart` as the web equivalent of the `IO` monad.
 
 <h3><a name="static">Static Routing</a></h3>
 
@@ -115,7 +115,7 @@ The top-level of our application is just a bunch of routes mappings to handlers.
 
 Each of the routes is tried until one successfully returns a value. In this case, a `Response`.
 
-We convert the list of handlers in a single handler using `msum`. 
+We convert the list of handlers in a single handler using `msum`.
 
 The last handler, `homePage` is not guarded by anything, so it will always be called if none of the other handlers were successful.
 
@@ -163,7 +163,7 @@ The `dir` function only matches on static path segments. If we have a dynamic pa
 > echo :: ServerPart Response
 > echo =
 >     path $ \(msg :: String) ->
->         ok $ template "echo" $ do 
+>         ok $ template "echo" $ do
 >           p $ "echo says: " >> toHtml msg
 >           p "Change the url to echo something else."
 
@@ -206,11 +206,11 @@ We can use `lookText` (and friends) to extract values from forms as well.
 >            ok $ template "form" $ do
 >              H.p "You said:"
 >              H.p (toHtml msg)
->               
+>
 
 We use the same `lookText` function from the previous section to look up values in in form data.
 
-You will also note that we use the `method` function to select between a `GET` request and a `POST` request. 
+You will also note that we use the `method` function to select between a `GET` request and a `POST` request.
 
 When the user first views the form, the browser will request "/form"
 using the `GET` method. In the form tag, we see that the form will
@@ -230,7 +230,7 @@ This example extends the form example to save the message in a cookie. That mean
 >           do method GET
 >              mMemory <- optional $ lookCookieValue "fortune"
 >              let memory = fromMaybe "Your future will be filled with web programming." mMemory
->              ok $ template "fortune" $ do 
+>              ok $ template "fortune" $ do
 >                     H.p "The message in your (fortune) cookie says:"
 >                     H.p (toHtml memory)
 >                     form ! action "/fortune" ! enctype "multipart/form-data" ! A.method "POST" $ do
@@ -283,13 +283,13 @@ On support platforms (Linux, OS X, Windows), the `serveDirectory` function will 
 Handling file uploads is very straight forward. We create a form, just as before. Except instead of `lookText` we use `lookFile`.
 
 > upload :: ServerPart Response
-> upload = 
->        msum [ uploadForm 
+> upload =
+>        msum [ uploadForm
 >             , handleUpload
 >             ]
 >     where
 >     uploadForm :: ServerPart Response
->     uploadForm = 
+>     uploadForm =
 >         do method GET
 >            ok $ template "upload form" $ do
 >              form ! enctype "multipart/form-data" ! A.method "POST" ! action "/upload" $ do
@@ -297,7 +297,7 @@ Handling file uploads is very straight forward. We create a form, just as before
 >                input ! type_ "submit" ! value "upload"
 >
 >     handleUpload :: ServerPart Response
->     handleUpload = 
+>     handleUpload =
 >         do (tmpFile, uploadName, contentType) <- lookFile "file_upload"
 >            ok $ template "file uploaded" $ do
 >                 p (toHtml $ "temporary file: " ++ tmpFile)
