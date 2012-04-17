@@ -439,7 +439,7 @@ serveDirectory = S.serveDirectory
 -- WARNING: No security checks are performed.
 --
 -- NOTE: alias for 'serveFileUsing' 'filePathSendFile'
-serveFile :: (FilePath -> ServerPart String)   -- ^ function for determining content-type of file. Typically 'asContentType'
+serveFile :: (FilePath -> IO String)   -- ^ function for determining content-type of file. Typically 'asContentType'
           -> FilePath                 -- ^ path to the file to serve
           -> ServerPart Response
 serveFile = S.serveFile
