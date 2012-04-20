@@ -1,5 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
-module Happstack.Lite 
+module Happstack.Lite
      ( -- * Core Types
        Request
      , Response
@@ -37,7 +37,7 @@ module Happstack.Lite
      -- * Cookies
      , Cookie(..)
      , CookieLife(..)
-     , mkCookie  
+     , mkCookie
      , addCookies
      , expireCookie
      , lookCookieValue
@@ -68,7 +68,7 @@ import qualified Happstack.Server as S
 -- * Starting the server
 
 -- | configuration to be used with 'serve' function
-data ServerConfig = 
+data ServerConfig =
     ServerConfig { port      :: Int       -- ^ port to listen on
                  , ramQuota  :: Int64     -- ^ maximum amount of POST data (in bytes)
                  , diskQuota :: Int64     -- ^ maximum file upload size (in bytes)
@@ -76,7 +76,7 @@ data ServerConfig =
                  }
 
 -- | a reasonable default 'ServerConfig'
--- 
+--
 -- > ServerConfig { port      = 8000
 -- >              , ramQuota  = 1 * 10^6
 -- >              , diskQuota = 20 * 10^6
@@ -94,7 +94,7 @@ defaultServerConfig =
 serve :: Maybe ServerConfig  -- ^ if Nothing, then use 'defaultServerConfig'
       -> ServerPart Response -- ^ request handler
       -> IO ()
-serve mServerConf part = 
+serve mServerConf part =
     let ServerConfig{..} = fromMaybe defaultServerConfig mServerConf
     in S.simpleHTTP (S.nullConf { S.port = port }) $
          do S.decodeBody (S.defaultBodyPolicy tmpDir diskQuota ramQuota (ramQuota `div` 10))
@@ -104,10 +104,10 @@ serve mServerConf part =
 
 -- | Pop a path element and run the supplied handler if it matches the
 -- given string.
--- 
+--
 -- > handler :: ServerPart Response
 -- > handler = dir "foo" $ dir "bar" $ subHandler
--- 
+--
 -- The path element can not contain \'/\'. See also 'dirs'.
 dir :: String -> ServerPart a -> ServerPart a
 dir = S.dir
@@ -120,7 +120,7 @@ path = S.path
 -- | guard which only succeeds if there are no remaining path segments
 --
 -- Often used if you want to explicitly assign a route for '/'
--- 
+--
 nullDir :: ServerPart ()
 nullDir = S.nullDir
 
@@ -151,9 +151,9 @@ toResponse = S.toResponse
 --
 -- Creates a 'Response' in a manner similar to the 'ToMessage' class,
 -- but without requiring an instance declaration.
--- 
+--
 -- example:
--- 
+--
 -- > import Data.ByteString.Char8 as C
 -- > import Data.ByteString.Lazy.Char8 as L
 -- > import Happstack.Lite
@@ -169,7 +169,7 @@ toResponseBS = S.toResponseBS
 -- * Response code
 
 -- | Respond with @200 OK@.
--- 
+--
 -- > main = serve Nothing $ ok "Everything is OK"
 ok :: a -> ServerPart a
 ok = S.ok
@@ -213,7 +213,7 @@ forbidden :: a -> ServerPart a
 forbidden = S.forbidden
 
 -- | Respond with @404 Not Found@.
--- 
+--
 -- > main = serve Nothing $ notFound "What you are looking for has not been found."
 notFound :: a -> ServerPart a
 notFound = S.notFound
@@ -222,10 +222,10 @@ notFound = S.notFound
 --
 -- A filter for setting the response code. Generally you will use a
 -- helper function like 'ok' or 'seeOther'.
--- 
+--
 -- > main = serve Nothing $ do setResponseCode 200
 -- >                           return "Everything is OK"
--- 
+--
 setResponseCode :: Int -- ^ response code
                 -> ServerPart ()
 setResponseCode = S.setResponseCode
@@ -249,7 +249,7 @@ seeOther :: (ToSURI uri) => uri -> a -> ServerPart a
 seeOther = S.seeOther
 
 -- | Respond with @302 Found@.
--- 
+--
 -- You probably want 'seeOther'. This method is not in popular use anymore, and is generally treated like 303 by most user-agents anyway.
 found :: (ToSURI uri) => uri -> a -> ServerPart a
 found = S.found
@@ -310,7 +310,7 @@ lookTexts = S.lookTexts
 -- must set enctype=\"multipart\/form-data\".
 --
 -- This function returns a tuple consisting of:
--- 
+--
 --  (1) The temporary location of the uploaded file
 --
 --  (2) The local filename supplied by the browser
@@ -331,7 +331,7 @@ lookCookieValue :: String -> ServerPart String
 lookCookieValue = S.lookCookieValue
 
 -- | Add the list 'Cookie' to the 'Response'.
--- 
+--
 addCookies :: [(CookieLife, Cookie)] -> ServerPart ()
 addCookies = S.addCookies
 
@@ -341,7 +341,7 @@ addCookies = S.addCookies
 -- >   do expireCookie "name"
 -- >      ok $ "The cookie has been expired."
 
-expireCookie :: String -> ServerPart () 
+expireCookie :: String -> ServerPart ()
 expireCookie = S.expireCookie
 
 -- * Headers
@@ -365,7 +365,7 @@ setHeaderM = S.setHeaderM
 -- * File Serving
 
 -- | Serve files and directories from a directory and its subdirectories using 'sendFile'.
--- 
+--
 -- Usage:
 --
 -- > serveDirectory EnableBrowsing ["index.html"] "path/to/files/on/disk"
@@ -373,7 +373,7 @@ setHeaderM = S.setHeaderM
 -- If the requested path does not match a file or directory on the
 -- disk, then 'serveDirectory' calls 'mzero'.
 --
--- If the requested path is a file then the file is served normally. 
+-- If the requested path is a file then the file is served normally.
 --
 -- If the requested path is a directory, then the result depends on
 -- what the first two arguments to the function are.
@@ -388,7 +388,7 @@ setHeaderM = S.setHeaderM
 -- find one of the index files (in the order they are listed). If that
 -- fails, it will show a directory listing if 'EnableBrowsing' is set,
 -- otherwise it will return @forbidden \"Directory index forbidden\"@.
--- 
+--
 -- Here is an explicit list of all the possible outcomes when the
 -- argument is a (valid) directory:
 --
@@ -402,7 +402,7 @@ setHeaderM = S.setHeaderM
 --
 -- 2. Otherwise returns, forbidden \"Directory index forbidden\"
 --
--- [@'EnableBrowsing', empty index file list@] 
+-- [@'EnableBrowsing', empty index file list@]
 --
 -- Always shows a directory index.
 --
@@ -420,22 +420,22 @@ serveDirectory :: Browsing    -- ^ allow directory browsing
 serveDirectory = S.serveDirectory
 
 -- | Serve a single, specified file. The name of the file being served is specified explicity. It is not derived automatically from the 'Request' url.
--- 
+--
 -- example 1:
--- 
+--
 --  Serve as a specific content-type:
 --
 -- > serveFile (asContentType "image/jpeg") "/srv/data/image.jpg"
 --
 --
 -- example 2:
--- 
+--
 --  Serve guessing the content-type from the extension:
--- 
+--
 -- > serveFile (guessContentTypeM mimeTypes) "/srv/data/image.jpg"
 --
 -- If the specified path does not exist or is not a file, this function will return 'mzero'.
--- 
+--
 -- WARNING: No security checks are performed.
 --
 -- NOTE: alias for 'serveFileUsing' 'filePathSendFile'
@@ -445,7 +445,7 @@ serveFile :: (FilePath -> IO String)   -- ^ function for determining content-typ
 serveFile = S.serveFile
 
 
--- | returns a specific content type, completely ignoring the 'FilePath' argument. 
+-- | returns a specific content type, completely ignoring the 'FilePath' argument.
 --
 -- Use this with 'serveFile' if you want to explicitly specify the
 -- content-type.
