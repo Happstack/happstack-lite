@@ -56,6 +56,7 @@ module Happstack.Lite
      ) where
 
 import Control.Monad (MonadPlus(..), msum)
+import Control.Monad.Trans (liftIO)
 import qualified Data.ByteString as B
 import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Int (Int64)
@@ -442,7 +443,7 @@ serveDirectory = S.serveDirectory
 serveFile :: (FilePath -> IO String)   -- ^ function for determining content-type of file. Typically 'asContentType'
           -> FilePath                 -- ^ path to the file to serve
           -> ServerPart Response
-serveFile = S.serveFile
+serveFile asContentType fp = S.serveFile (liftIO . asContentType) fp
 
 
 -- | returns a specific content type, completely ignoring the 'FilePath' argument.
