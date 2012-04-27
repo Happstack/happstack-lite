@@ -1,4 +1,27 @@
 {-# LANGUAGE RecordWildCards #-}
+{-| @happstack-lite@ provides a simplied introduction to
+@happstack-server@. (Nearly) all the functions in @happstack-lite@ are simple re-exports from the @happstack-server@ package. @happstack-lite@ offers two
+key advantages over @happstack-server@:
+
+ 1. it only contains the most commonly used functions, gathered in one convenient location.
+
+ 2. the type signatures have been simplified to remove most references
+    to type classes, monad transformers, and other potentially confusing
+    type signatures.
+
+The beautiful part about @happstack-lite@ is that because it merely @re-exports@ functions and types from @happstack-server@ it is possible to gradually import extra functionality from @happstack-server@ on an as-need basis.
+
+There is a brief introduction to @happstack-lite@ located here:
+
+<http://www.happstack.com/C/ViewPage/9>
+
+More detailed examples and information can be found in the Happstack Crash Course:
+
+<http://www.happstack.com/docs/crashcourse/index.html>
+
+The Happstack Crash Course is written against @happstack-server@ but the behavior of the functions available in @happstack-lite@ is almost identical.
+
+-}
 module Happstack.Lite
      ( -- * Core Types
        Request
@@ -50,20 +73,23 @@ module Happstack.Lite
      , serveDirectory
      , serveFile
      , asContentType
+     , MimeMap
+     , guessContentTypeM
+     , mimeTypes
      -- * Other
      , MonadPlus(..)
      , msum
      ) where
 
-import Control.Monad (MonadPlus(..), msum)
-import Control.Monad.Trans (liftIO)
-import qualified Data.ByteString as B
+import Control.Monad              (MonadPlus(..), msum)
+import Control.Monad.Trans        (liftIO)
+import qualified Data.ByteString  as B
 import Data.ByteString.Lazy.Char8 (ByteString)
-import Data.Int (Int64)
-import Data.Maybe (fromMaybe)
-import Data.Text.Lazy (Text)
-import Happstack.Server (ContentType, Request, Response, ServerPart, FromReqURI, Method(..), MatchMethod, ToMessage(..), Cookie(..), CookieLife(..), Browsing, mkCookie)
-import Happstack.Server.SURI (ToSURI)
+import Data.Int                   (Int64)
+import Data.Maybe                 (fromMaybe)
+import Data.Text.Lazy             (Text)
+import Happstack.Server           (ContentType, Request, Response, ServerPart, FromReqURI, Method(..), MatchMethod, MimeMap, ToMessage(..), Cookie(..), CookieLife(..), Browsing, mimeTypes, mkCookie)
+import Happstack.Server.SURI      (ToSURI)
 import qualified Happstack.Server as S
 
 -- * Starting the server
@@ -413,7 +439,7 @@ setHeaderM = S.setHeaderM
 --
 -- 2. Otherwise shows a directory index
 --
--- see also: 'defaultIxFiles', 'serveFile'
+-- see also: 'serveFile'
 serveDirectory :: Browsing    -- ^ allow directory browsing
                -> [FilePath]  -- ^ index file names, in case the requested path is a directory
                -> FilePath    -- ^ file/directory to serve
@@ -440,11 +466,10 @@ serveDirectory = S.serveDirectory
 -- WARNING: No security checks are performed.
 --
 -- NOTE: alias for 'serveFileUsing' 'filePathSendFile'
-serveFile :: (FilePath -> IO String)   -- ^ function for determining content-type of file. Typically 'asContentType'
+serveFile :: (FilePath -> ServerPart String)   -- ^ function for determining content-type of file. Typically 'asContentType'
           -> FilePath                 -- ^ path to the file to serve
           -> ServerPart Response
-serveFile asContentType fp = S.serveFile (liftIO . asContentType) fp
-
+serveFile asContentType fp = S.serveFile asContentType fp
 
 -- | returns a specific content type, completely ignoring the 'FilePath' argument.
 --
@@ -453,5 +478,16 @@ serveFile asContentType fp = S.serveFile (liftIO . asContentType) fp
 --
 -- see also: 'serveFile'
 asContentType :: String  -- ^ the content-type to return
-              -> (FilePath -> IO String)
-asContentType = S.asContentType
+              -> (FilePath -> ServerPart String)
+asContentType ct = liftIO . S.asContentType ct
+
+-- | try to guess the content-type of a file based on its extension
+--
+-- defaults to "application/octet-stream" if no match was found.
+--
+-- Useful as an argument to 'serveFile'
+--
+-- see also: 'serveFile', 'mimeTypes'
+guessContentTypeM :: MimeMap -- ^ map from file extensions to mime-types (usually 'mimeTypes')
+                  -> (FilePath -> ServerPart String)
+guessContentTypeM mm = liftIO . S.guessContentTypeM mm
