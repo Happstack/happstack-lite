@@ -1,5 +1,5 @@
 Name:                happstack-lite
-Version:             7.3.0
+Version:             7.3.1
 Synopsis:            Happstack minus the useless stuff
 Description:         This packages provides a subset of Happstack that is easier to learn but still very useful. It as 100% compatible with the full version of Happstack.
 Homepage:            http://www.happstack.com/
@@ -18,6 +18,6 @@ Library
 
   Build-depends: base             < 5,
                  bytestring       >= 0.9 && < 0.11,
-                 happstack-server == 7.1.*,
+                 happstack-server >= 7.1 && < 7.4,
                  mtl              >= 2 && < 2.2,
                  text             == 0.11.*
